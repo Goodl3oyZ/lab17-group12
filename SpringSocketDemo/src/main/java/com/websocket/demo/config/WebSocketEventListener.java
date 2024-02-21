@@ -18,10 +18,12 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String username = (String) headerAccessor.getSessionAttributes().get("username");
+        ChatMessage.cutCount();
         if (username != null) {
             var chatMessage = ChatMessage.builder()
                     .type(MessageType.LEAVE)
                     .sender(username)
+                    .prevOnline(ChatMessage.GetCount())
                     .build();
 
             messageSendingOperations.convertAndSend("/topic/public", chatMessage);
